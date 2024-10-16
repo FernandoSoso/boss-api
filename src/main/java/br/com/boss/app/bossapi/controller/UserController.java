@@ -3,9 +3,13 @@ package br.com.boss.app.bossapi.controller;
 import br.com.boss.app.bossapi.dto.user.request.SubmitUserDTO;
 import br.com.boss.app.bossapi.dto.user.response.UniqueUserDTO;
 import br.com.boss.app.bossapi.dto.user.response.UserDTO;
+import br.com.boss.app.bossapi.repository.UserRepository;
+import br.com.boss.app.bossapi.service.UserService;
 import jakarta.servlet.annotation.WebServlet;
 
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @WebServlet("/user")
 public class UserController {
@@ -14,12 +18,15 @@ public class UserController {
 //        String operacao = req.getParameter("operacao");
 //        String offset = req.getParameter("offset");
 //        String limit = req.getParameter("limit");
+    private UserService service;
+
+    UserController(UserService service){
+        this.service = service;
+    }
 
     @GetMapping("/")
-    public UserDTO getUsers() {
-        //TODO: Implementar
-
-        return null;
+    public List<UserDTO> getUsers() {
+        return service.getAll();
     }
 
     @GetMapping("/unique/{id}")
