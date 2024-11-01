@@ -3,12 +3,17 @@ package br.com.boss.app.bossapi.controller;
 import br.com.boss.app.bossapi.dto.user.request.SubmitUserDTO;
 import br.com.boss.app.bossapi.dto.user.response.UniqueUserDTO;
 import br.com.boss.app.bossapi.dto.user.response.UserDTO;
+import br.com.boss.app.bossapi.model.User;
 import br.com.boss.app.bossapi.repository.UserRepository;
 import br.com.boss.app.bossapi.service.UserService;
 import jakarta.servlet.annotation.WebServlet;
 
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @WebServlet("/user")
@@ -25,35 +30,39 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public List<UserDTO> getUsers() {
-        return service.getAll();
+    public ResponseEntity<List<User>> getUsers() {
+        List<User> userList = service.getAll();
+
+        return ResponseEntity.ok(userList);
     }
 
     @GetMapping("/unique/{id}")
-    public UniqueUserDTO uniqueUser(@PathVariable Long id) {
-        //TODO: Implementar
-        return null;
+    public ResponseEntity<User> uniqueUser(@PathVariable String id) {
+        User u = this.service.getUnique(id);
+
+        return ResponseEntity.ok(u);
     }
 
     @PostMapping("/submit")
-    public void submitUser(@RequestBody SubmitUserDTO newUserData) {
-        //TODO: Implementar e ver necessidade das props antigas
+    public ResponseEntity<User> submitUser(@RequestBody @Valid User newUserData, UriComponentsBuilder uriBuilder) {
+        this.service.insert(newUserData);
 
-//        String nome = req.getParameter("nome");
-//        String email = req.getParameter("email");
-//        String senha = req.getParameter("senha");
-//        String permissao = req.getParameter("permissao");
-//        String operacao = req.getParameter("operacao");
-//        String codExterno = req.getParameter("cod");
+        URI uri = uriBuilder.path("/user/unique/{id}").buildAndExpand(newUserData.getUuid()).toUri();
+
+        return ResponseEntity.created(uri).body(newUserData);
     }
 
     @PutMapping("/alter/{id}")
-    public void alterUser(@PathVariable String id, @RequestBody SubmitUserDTO userData) {
-        //TODO: Implementar
+    public ResponseEntity<User> alterUser(@PathVariable String id, @RequestBody User userData) {
+        this.service.update(userData);
+
+        return ResponseEntity.ok(userData);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable String id) {
-        //TODO: Implementar
+    public ResponseEntity deleteUser(@PathVariable String id) {
+        this.service.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

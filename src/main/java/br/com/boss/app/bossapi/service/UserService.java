@@ -66,13 +66,8 @@ public class UserService {
         return repository.findByUuid(formattedUuid);
     }
 
-    public List<UserDTO> getAll(){
+    public List<User> getAll(){
         List<User> users = repository.findAll();
-        List<UserDTO> returnUsers;
-
-        users.forEach(user -> {
-
-        });
 
         return repository.findAll();
     }
