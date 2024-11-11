@@ -2,7 +2,9 @@ package br.com.boss.app.bossapi.dto.user.response;
 
 import br.com.boss.app.bossapi.enums.Role;
 
-public record UserDTO(String id,
-                      String name,
-                      String email,
-                      Role role) { }
+public interface UserDTO {
+    public String getUuid();
+    public String getName();
+    public String getEmail();
+    public Role getRole();
+}

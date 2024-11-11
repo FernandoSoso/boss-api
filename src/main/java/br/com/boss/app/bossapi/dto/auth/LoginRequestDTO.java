@@ -1,4 +1,6 @@
 package br.com.boss.app.bossapi.dto.auth;
 
-public record LoginRequestDTO(String email,
-                              String password) { }
+public interface LoginRequestDTO {
+    public String getEmail();
+    public String getPassword();
+}

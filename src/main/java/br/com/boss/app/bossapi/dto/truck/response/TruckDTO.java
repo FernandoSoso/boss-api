@@ -1,11 +1,13 @@
 package br.com.boss.app.bossapi.dto.truck.response;
 
-import br.com.boss.app.bossapi.enums.TruckStatus;
+import br.com.boss.app.bossapi.enums.SituationStatus;
 
-public record TruckDTO(String id,
-                       String licensePlate,
-                       String brand,
-                       String model,
-                       Integer year,
-                       Double capacity,
-                       TruckStatus status) { }
+public interface TruckDTO {
+    public String getUuid();
+    public String getLicensePlate();
+    public String getBrand();
+    public String getModel();
+    public Integer getYear();
+    public Double getCapacity();
+    public SituationStatus getStatus();
+}

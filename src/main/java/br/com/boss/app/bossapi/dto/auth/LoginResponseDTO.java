@@ -1,3 +1,5 @@
 package br.com.boss.app.bossapi.dto.auth;
 
-public record LoginResponseDTO (String token) { }
+public interface LoginResponseDTO {
+    public String getToken();
+}
