@@ -1,6 +1,9 @@
 package br.com.boss.app.bossapi.service;
 
+import br.com.boss.app.bossapi.dto.user.request.SubmitUserDTO;
+import br.com.boss.app.bossapi.dto.user.response.UniqueUserDTO;
 import br.com.boss.app.bossapi.dto.user.response.UserDTO;
+import br.com.boss.app.bossapi.enums.Role;
 import br.com.boss.app.bossapi.model.User;
 import br.com.boss.app.bossapi.repository.UserRepository;
 import br.com.boss.app.bossapi.util.SenhaHash;
@@ -16,35 +19,41 @@ public class UserService {
         this.repository = repository;
     }
 
-    public User insert(User user) throws Exception {
+    public void insert(SubmitUserDTO user) throws Exception {
         User u = this.repository.findByEmail(user.getEmail());
+
         if (u == null){
             String encriptedPassword = SenhaHash.getSHA256Hash(user.getPassword());
 
-            user.setPassword(encriptedPassword);
+            u = new User(
+                user.getEmail(),
+                encriptedPassword,
+                user.getName(),
+                user.getRole()
+            );
 
-            return this.repository.save(user);
+            this.repository.save(u);
         }
         else{
             throw new Exception("Email já cadastrado!");
         }
     }
 
-    public User update (User user) throws Exception {
+    public void update (SubmitUserDTO user, String userId) throws Exception {
         User u = this.repository.findByEmail(user.getEmail());
 
         if (u != null){
-            if (!Objects.equals(u.getUuid(), user.getUuid())){
+            if (!Objects.equals(u.getUuid(), userId)){
                 throw new Exception("Email já cadastrado!");
             }
         }
         else{
-            u = this.repository.findByUuid(UUID.fromString(user.getUuid()));
+            u = this.repository.findByUuid(userId);
         }
 
         // Se a senha não for a mesma, é criptografada a nova senha
         if (!u.getPassword().equals(user.getPassword())){
-            user.setPassword(SenhaHash.getSHA256Hash(user.getPassword()));
+            u.setPassword(SenhaHash.getSHA256Hash(user.getPassword()));
         }
 
         // Atualização de propriedades
@@ -53,22 +62,29 @@ public class UserService {
         u.setName(user.getName());
         u.setEmail(user.getEmail());
 
-        return this.repository.save(u);
+        this.repository.save(u);
     }
 
     public void delete(String uuid){
-        UUID formattedUuid = UUID.fromString(uuid);
-        this.repository.deleteByUuid(formattedUuid);
+        this.repository.deleteByUuid(uuid);
     }
 
-    public User getUnique(String uuid){
-        UUID formattedUuid = UUID.fromString(uuid);
-        return repository.findByUuid(formattedUuid);
+    public UniqueUserDTO getUnique(String uuid){
+        User u = this.repository.findByUuid(uuid);
+
+        return new UniqueUserDTO() {
+            @Override
+            public String getName() {return u.getName();}
+            @Override
+            public String getEmail() {return u.getEmail();}
+            @Override
+            public Role getRole() {return u.getRole();}
+            @Override
+            public String getUuid() {return u.getUuid();}
+        };
     }
 
-    public List<User> getAll(){
-        List<User> users = repository.findAll();
-
-        return repository.findAll();
+    public List<UserDTO> getAll(){
+       return repository.findAllUsers();
     }
 }

@@ -23,28 +23,28 @@ public class UserController {
 //        String operacao = req.getParameter("operacao");
 //        String offset = req.getParameter("offset");
 //        String limit = req.getParameter("limit");
-    private UserService service;
+    private final UserService service;
 
     UserController(UserService service){
         this.service = service;
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<User>> getUsers() {
-        List<User> userList = service.getAll();
+    public ResponseEntity<List<UserDTO>> getUsers() {
+        List<UserDTO> userList = service.getAll();
 
         return ResponseEntity.ok(userList);
     }
 
     @GetMapping("/unique/{id}")
-    public ResponseEntity<User> uniqueUser(@PathVariable String id) {
-        User u = this.service.getUnique(id);
+    public ResponseEntity<UniqueUserDTO> uniqueUser(@PathVariable String id) {
+        UniqueUserDTO u = this.service.getUnique(id);
 
         return ResponseEntity.ok(u);
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<User> submitUser(@RequestBody @Valid User newUserData, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<SubmitUserDTO> submitUser(@RequestBody @Valid SubmitUserDTO newUserData, UriComponentsBuilder uriBuilder) throws Exception {
         this.service.insert(newUserData);
 
         URI uri = uriBuilder.path("/user/unique/{id}").buildAndExpand(newUserData.getUuid()).toUri();
@@ -53,8 +53,8 @@ public class UserController {
     }
 
     @PutMapping("/alter/{id}")
-    public ResponseEntity<User> alterUser(@PathVariable String id, @RequestBody User userData) {
-        this.service.update(userData);
+    public ResponseEntity<SubmitUserDTO> alterUser(@PathVariable String id, @RequestBody SubmitUserDTO userData) throws Exception {
+        this.service.update(userData, id);
 
         return ResponseEntity.ok(userData);
     }
