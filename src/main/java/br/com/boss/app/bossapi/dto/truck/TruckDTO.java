@@ -1,4 +1,4 @@
-package br.com.boss.app.bossapi.dto.truck.response;
+package br.com.boss.app.bossapi.dto.truck;
 
 import br.com.boss.app.bossapi.enums.SituationStatus;
 
