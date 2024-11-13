@@ -4,12 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class SenhaHash {
+public class HashPassword {
 
-    public static String getSHA256Hash(String senha) {
+    public static String getSHA256Hash(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(senha.getBytes(StandardCharsets.UTF_8));
+            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
 
             StringBuilder hexString = new StringBuilder();
 
