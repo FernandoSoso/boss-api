@@ -1,0 +1,634 @@
+{
+	"info": {
+		"_postman_id": "044e8bef-1c72-4954-8453-fa9c338a7c38",
+		"name": "Endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38417107"
+	},
+	"item": [
+		{
+			"name": "Historico",
+			"item": [
+				{
+					"name": "histórico de caminhão",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/history/truck/fba20621-6ee4-47c1-8ed5-8eafe2ab9766",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"history",
+								"truck",
+								"fba20621-6ee4-47c1-8ed5-8eafe2ab9766"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "histórico de motorista",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/history/driver/a0b830bf-7052-4777-9666-4f9b61a8ba0d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"history",
+								"driver",
+								"a0b830bf-7052-4777-9666-4f9b61a8ba0d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "finalizar entrada atual",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/history/setEnd/10a62d74-9b21-4357-b67a-61ae75ea6418",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"history",
+								"setEnd",
+								"10a62d74-9b21-4357-b67a-61ae75ea6418"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "alterar entrada atual",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"driverUuid\" : \"a0b830bf-7052-4777-9666-4f9b61a8ba0d\",\r\n    \"truckUuid\" : \"fba20621-6ee4-47c1-8ed5-8eafe2ab9766\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/history/change",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"history",
+								"change"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delivery",
+			"item": [
+				{
+					"name": "cadastrar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"responsible\" : {\r\n        \"driverUuid\" : \"a0b830bf-7052-4777-9666-4f9b61a8ba0d\",\r\n        \"truckUuid\" : \"fba20621-6ee4-47c1-8ed5-8eafe2ab9766\"\r\n    },\r\n    \"origin\" : \"Santa Maria\",\r\n    \"destination\" : \"Caxias do Sul\",\r\n    \"valuePerTon\" : 123.76,\r\n    \"weight\" : 12545.34,\r\n    \"driverShare\" : 1234.12,\r\n    \"observation\" : \"Produto frágil\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/delivery/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"delivery",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"responsible\" : {\r\n        \"driverUuid\" : \"a0b830bf-7052-4777-9666-4f9b61a8ba0d\",\r\n        \"truckUuid\" : \"fba20621-6ee4-47c1-8ed5-8eafe2ab9766\"\r\n    },\r\n    \"origin\" : \"Santa Maria\",\r\n    \"destination\" : \"Caxias do Sul\",\r\n    \"valuePerTon\" : 21.54,\r\n    \"weight\" : 4321.12,\r\n    \"driverShare\" : 112.80,\r\n    \"observation\" : \"Produto frágil ABCD\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/delivery/alter/cc6cdbb4-0304-4d3a-9423-4d50e909a8e2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"delivery",
+								"alter",
+								"cc6cdbb4-0304-4d3a-9423-4d50e909a8e2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "todos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/delivery/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"delivery",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unico",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/delivery/unique/cc6cdbb4-0304-4d3a-9423-4d50e909a8e2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"delivery",
+								"unique",
+								"cc6cdbb4-0304-4d3a-9423-4d50e909a8e2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/delivery/cc6cdbb4-0304-4d3a-9423-4d50e909a8e2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"delivery",
+								"cc6cdbb4-0304-4d3a-9423-4d50e909a8e2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Truck",
+			"item": [
+				{
+					"name": "cadastrar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"licensePlate\" : \"ABC1D23\",\r\n    \"brand\" : \"Volkswagem\",\r\n    \"model\" : \"A12\",\r\n    \"year\" : 2012,\r\n    \"capacity\" : 123212,\r\n    \"driverPercentage\" : 12.3,\r\n    \"truckStatus\" : \"DISPONIVEL\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/truck/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"truck",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"licensePlate\" : \"ABC1234\",\r\n    \"brand\" : \"Volvo\",\r\n    \"model\" : \"S123\",\r\n    \"year\" : 2011,\r\n    \"capacity\" : 12212,\r\n    \"driverPercentage\" : 12.3,\r\n    \"truckStatus\" : \"INDISPONIVEL\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/truck/alter/b409770e-cb02-4e97-bc9c-8054a823dcc8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"truck",
+								"alter",
+								"b409770e-cb02-4e97-bc9c-8054a823dcc8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "todos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/truck/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"truck",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unico",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/truck/unique/b409770e-cb02-4e97-bc9c-8054a823dcc8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"truck",
+								"unique",
+								"b409770e-cb02-4e97-bc9c-8054a823dcc8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/truck/b409770e-cb02-4e97-bc9c-8054a823dcc8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"truck",
+								"b409770e-cb02-4e97-bc9c-8054a823dcc8"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "cadastrar",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Fernando Soso\",\r\n    \"password\": \"senhA123\",\r\n    \"email\": \"fernandososo@mail.com\",\r\n    \"userRole\": \"USer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/user/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"user",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"FSG\",\r\n    \"userRole\": \"USER\",\r\n    \"password\": \"2345678234\",\r\n    \"email\": \"fsg2@mail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/user/alter/2c3418a3-6154-429f-97c3-427446fcaa3b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"user",
+								"alter",
+								"2c3418a3-6154-429f-97c3-427446fcaa3b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "todos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/user/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"user",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unico",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/user/unique/2c3418a3-6154-429f-97c3-427446fcaa3b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"user",
+								"unique",
+								"2c3418a3-6154-429f-97c3-427446fcaa3b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/user/2c3418a3-6154-429f-97c3-427446fcaa3b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"user",
+								"2c3418a3-6154-429f-97c3-427446fcaa3b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Driver",
+			"item": [
+				{
+					"name": "cadastrar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Roberto\",\r\n    \"primaryPhone\" : \"(55) 34523-2345\",\r\n    \"secondaryPhone\" : \"(35) 32323-2125\",\r\n    \"email\" : \"roberto@mail.com\",\r\n    \"licenseNumber\" : \"12378434322\",\r\n    \"licenseExpirationDate\" : \"2032-01-12\",\r\n    \"driverStatus\" : \"DISPONIVEL\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/driver/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"driver",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Roberto Atualizado\",\r\n    \"primaryPhone\" : \"(55) 12345-2345\",\r\n    \"secondaryPhone\" : null,\r\n    \"email\" : \"robertoAtt@mail.com\",\r\n    \"licenseNumber\" : \"12324343223\",\r\n    \"licenseExpirationDate\" : \"2025-01-12\",\r\n    \"driverStatus\" : \"DISPONIVEL\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/driver/alter/12115468-9c1f-4abb-adb3-404c00ae985d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"driver",
+								"alter",
+								"12115468-9c1f-4abb-adb3-404c00ae985d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "todos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/driver/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"driver",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unico",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/driver/unique/12115468-9c1f-4abb-adb3-404c00ae985d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"driver",
+								"unique",
+								"12115468-9c1f-4abb-adb3-404c00ae985d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/boss-api/driver/12115468-9c1f-4abb-adb3-404c00ae985d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"driver",
+								"12115468-9c1f-4abb-adb3-404c00ae985d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

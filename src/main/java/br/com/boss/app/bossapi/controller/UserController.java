@@ -36,17 +36,11 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Usuários encontrados",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UserDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado", content = @Content)
     })
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> userList = service.getAll();
 
-        if (userList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        else{
-            return ResponseEntity.ok(userList);
-        }
+        return ResponseEntity.ok(userList);
     }
 
     @GetMapping("/unique/{uuid}")
@@ -57,10 +51,15 @@ public class UserController {
                             schema = @Schema(implementation = UniqueUserDTO.class))),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content)
     })
-    public ResponseEntity<UniqueUserDTO> uniqueUser(@PathVariable String uuid) throws Exception {
+    public ResponseEntity<UniqueUserDTO> uniqueUser(@PathVariable String uuid) {
         UniqueUserDTO u = this.service.getUnique(uuid);
 
-        return ResponseEntity.ok(u);
+        if (u == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(u);
+        }
     }
 
     @Transactional
@@ -70,7 +69,7 @@ public class UserController {
             @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UniqueUserDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos", content = @Content)
     })
     public ResponseEntity<UniqueUserDTO> submitUser(@RequestBody @Valid User newUserData, UriComponentsBuilder uriBuilder) throws Exception {
         UniqueUserDTO returnedUser = this.service.insert(newUserData);
@@ -87,11 +86,18 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Usuário alterado com sucesso",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UniqueUserDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Usuário não encontrado ou dados inválidos fornecidos")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content)
     })
     public ResponseEntity<UniqueUserDTO> alterUser(@PathVariable String uuid, @RequestBody User userData) throws Exception {
         UniqueUserDTO returnedUser = this.service.update(userData, uuid);
-        return ResponseEntity.ok(returnedUser);
+
+        if (returnedUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else{
+            return ResponseEntity.ok(returnedUser);
+        }
     }
 
     @Transactional
@@ -99,10 +105,14 @@ public class UserController {
     @Operation(summary = "Deletar um usuário", description = "Deleta um usuário existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Usuário não encontrado")
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    public ResponseEntity<Void> deleteUser(@PathVariable String uuid) throws Exception {
-        this.service.delete(uuid);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteUser(@PathVariable String uuid) {
+        if (this.service.delete(uuid)) {
+            return ResponseEntity.noContent().build();
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
     }
 }

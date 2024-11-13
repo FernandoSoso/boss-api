@@ -38,8 +38,7 @@ public class DeliveryController {
             @ApiResponse(responseCode = "200", description = "Entregas encontradas", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = DeliveryDTO.class)
-            )),
-            @ApiResponse(responseCode = "404", description = "Entregas não encontradas", content = @Content)
+            ))
     })
     public ResponseEntity<List<DeliveryDTO>> getDeliveries() {
         List<DeliveryDTO> deliveries = this.service.getAll();
@@ -54,12 +53,18 @@ public class DeliveryController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = UniqueDeliveryDTO.class)
             )),
+            @ApiResponse(responseCode = "400", description = "Dados fornecidos são inválidos", content = @Content),
             @ApiResponse(responseCode = "404", description = "Entrega não encontrada", content = @Content)
     })
     public ResponseEntity<UniqueDeliveryDTO> uniqueDelivery(@PathVariable String uuid) throws Exception {
         UniqueDeliveryDTO delivery = this.service.getUnique(uuid);
 
-        return ResponseEntity.ok(delivery);
+        if (delivery == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(delivery);
+        }
     }
 
     @PostMapping("/submit")
@@ -70,7 +75,7 @@ public class DeliveryController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = SubmitDeliveryDTO.class)
             )),
-            @ApiResponse(responseCode = "400", description = "Erro no cadastro da entrega", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Dados fornecidos são inválidos", content = @Content)
     })
     public ResponseEntity<SubmitDeliveryDTO> submitDelivery(@RequestBody @Valid InputDeliveryDTO newDeliveryData, UriComponentsBuilder uriBuilder) throws Exception {
         SubmitDeliveryDTO delivery = this.service.insert(newDeliveryData);
@@ -88,12 +93,18 @@ public class DeliveryController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = SubmitDeliveryDTO.class)
             )),
-            @ApiResponse(responseCode = "400", description = "Erro na alteração da entrega", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Dados fornecidos são inválidos", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Entrega não encontrada", content = @Content)
     })
     public ResponseEntity<SubmitDeliveryDTO> alterDelivery(@PathVariable String uuid, @RequestBody @Valid InputDeliveryDTO deliveryData) throws Exception {
         SubmitDeliveryDTO delivery = this.service.update(deliveryData, uuid);
 
-        return ResponseEntity.ok(delivery);
+        if (delivery == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else{
+            return ResponseEntity.ok(delivery);
+        }
     }
 
     @DeleteMapping("/{uuid}")
@@ -101,11 +112,14 @@ public class DeliveryController {
     @Operation(summary = "Deletar uma entrega", description = "Deleta uma entrega do sistema")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Entrega deletada com sucesso", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Erro na deleção da entrega", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Entrega não encontrada", content = @Content)
     })
     public ResponseEntity<Void> deleteDelivery(@PathVariable String uuid) throws Exception {
-        this.service.delete(uuid);
-
-        return ResponseEntity.noContent().build();
+        if (this.service.delete(uuid)) {
+            return ResponseEntity.noContent().build();
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

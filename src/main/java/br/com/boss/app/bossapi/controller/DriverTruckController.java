@@ -30,20 +30,32 @@ public class DriverTruckController {
     @Operation(summary = "Retorna o histórico de um caminhão", description = "Retorna o histórico de um caminhão")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Histórico encontrado"),
-            @ApiResponse(responseCode = "404", description = "Histórico não encontrado")
+            @ApiResponse(responseCode = "404", description = "Caminhão não encontrado")
     })
     public ResponseEntity<List<Driver_TruckDTO>> getTruckHistory(@PathVariable String uuid){
-        return ResponseEntity.ok(service.getTruckHistory(uuid));
+        if (service.getTruckHistory(uuid) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(service.getTruckHistory(uuid));
+        }
     }
 
     @GetMapping("/driver/{uuid}")
     @Operation(summary = "Retorna o histórico de um motorista", description = "Retorna o histórico de um motorista")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Histórico encontrado"),
-            @ApiResponse(responseCode = "404", description = "Histórico não encontrado")
+            @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
     })
     public ResponseEntity<List<Driver_TruckDTO>> getDriverHistory(@PathVariable String uuid){
-        return ResponseEntity.ok(service.getDriverHistory(uuid));
+        List<Driver_TruckDTO> driverHistory = service.getDriverHistory(uuid);
+
+        if (driverHistory == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(driverHistory);
+        }
     }
 
     @PostMapping("/change")
@@ -51,7 +63,8 @@ public class DriverTruckController {
     @Operation(summary = "Altera uma entrada de um motorista/caminhão", description = "Altera uma entrada no histórico de um motorista ou caminhão")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Entrada alterada com sucesso"),
-            @ApiResponse(responseCode = "204", description = "Entrada não alterada")
+            @ApiResponse(responseCode = "204", description = "Entrada não alterada"),
+            @ApiResponse(responseCode = "400", description = "Dados forncecidos são inválidos")
     })
     public ResponseEntity<Void> changeEntry(@RequestBody @Valid EntryDTO newEntryDTO) throws Exception {
         boolean isCreated = this.service.changeHistory(newEntryDTO);
@@ -68,11 +81,15 @@ public class DriverTruckController {
     @Operation(summary = "Finaliza uma entrada de um motorista/caminhão", description = "Finaliza  uma entrada no histórico de um motorista ou caminhão")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Entrada finalizada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Entrada não finalizada")
+            @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
     })
     public ResponseEntity<Void> endHistory(@PathVariable String uuid) throws Exception {
-        this.service.endHistory(uuid);
 
-        return ResponseEntity.noContent().build();
+        if(this.service.endHistory(uuid)){
+            return ResponseEntity.noContent().build();
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

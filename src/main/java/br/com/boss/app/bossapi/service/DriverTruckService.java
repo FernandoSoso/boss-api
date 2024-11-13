@@ -81,27 +81,39 @@ public class DriverTruckService {
     }
 
     public List<Driver_TruckDTO> getTruckHistory(String truckUuid) {
+        Truck truck = this.truckRepository.findByUuid(UUID.fromString(truckUuid));
+
+        if (truck == null){
+            return null;
+        }
+
         return this.repository.findByTruckUuid(UUID.fromString(truckUuid));
     }
 
     public List<Driver_TruckDTO> getDriverHistory(String uuid) {
+        Driver driver = this.driverRepository.findByUuid(UUID.fromString(uuid));
+
+        if (driver == null){
+            return null;
+        }
+
         return this.repository.findByDriverUuid(UUID.fromString(uuid));
     }
 
-    public void endHistory(String uuid) throws Exception {
+    public boolean endHistory(String uuid) throws Exception {
         Driver_Truck driverTruck = this.repository.findByUuid(UUID.fromString(uuid));
 
         if (driverTruck == null){
-            throw new BadRequestException("Entrada não encontrada!");
+            return false;
         }
-        else{
-            if (driverTruck.getEndDate() != null){
-                throw new BadRequestException("Entrada já finalizada!");
-            }
 
-            driverTruck.setEndDate(new Date(System.currentTimeMillis()));
-            this.repository.save(driverTruck);
+        if (driverTruck.getEndDate() != null){
+            throw new BadRequestException("Entrada já finalizada!");
         }
+
+        driverTruck.setEndDate(new Date(System.currentTimeMillis()));
+        this.repository.save(driverTruck);
+        return true;
     }
 
 }

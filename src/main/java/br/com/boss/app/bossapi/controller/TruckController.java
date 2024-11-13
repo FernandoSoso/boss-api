@@ -54,7 +54,13 @@ public class TruckController {
     })
     public ResponseEntity<UniqueTruckDTO> uniqueTruck(@PathVariable String uuid) throws Exception {
         UniqueTruckDTO u = this.service.getUnique(uuid);
-        return ResponseEntity.ok(u);
+
+        if (u == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(u);
+        }
     }
 
     @PostMapping("/submit")
@@ -64,7 +70,7 @@ public class TruckController {
             @ApiResponse(responseCode = "201", description = "Caminhão cadastrado com sucesso", content = @Content(
                     schema = @Schema(implementation = SubmitTruckDTO.class)
             )),
-            @ApiResponse(responseCode = "400", description = "Erro na requisição")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
     })
     public ResponseEntity<SubmitTruckDTO> submitTruck(@RequestBody @Valid Truck newTruckData, UriComponentsBuilder uriBuilder) throws Exception {
         SubmitTruckDTO newTruck = this.service.insert(newTruckData);
@@ -81,12 +87,18 @@ public class TruckController {
             @ApiResponse(responseCode = "200", description = "Caminhão alterado com sucesso", content = @Content(
                     schema = @Schema(implementation = SubmitTruckDTO.class)
             )),
-            @ApiResponse(responseCode = "400", description = "Caminhão não encontrado ou dados inválidos")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos"),
+            @ApiResponse(responseCode = "404", description = "Caminhão não encontrado")
     })
     public ResponseEntity<SubmitTruckDTO> alterTruck(@PathVariable String uuid, @RequestBody @Valid Truck truckData) throws Exception {
         SubmitTruckDTO newTruck = this.service.update(truckData, uuid);
 
-        return ResponseEntity.ok(newTruck);
+        if (newTruck == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else{
+            return ResponseEntity.ok(newTruck);
+        }
     }
 
     @DeleteMapping("/{uuid}")
@@ -96,8 +108,13 @@ public class TruckController {
             @ApiResponse(responseCode = "204", description = "Caminhão deletado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Caminhão não encontrado")
     })
-    public ResponseEntity<Void> deleteTruck(@PathVariable String uuid) throws Exception {
-        this.service.delete(uuid);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteTruck(@PathVariable String uuid) {
+
+        if (this.service.delete(uuid)) {
+            return ResponseEntity.noContent().build();
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

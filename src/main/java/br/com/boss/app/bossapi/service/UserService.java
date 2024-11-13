@@ -10,7 +10,6 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -31,7 +30,7 @@ public class UserService {
         User u = this.repository.findByUuid(UUID.fromString(userId));
 
         if (u == null){
-            throw new BadRequestException("Usuário não encontrado!");
+            return null;
         }
 
         u.setName(userData.getName());
@@ -58,27 +57,27 @@ public class UserService {
     }
 
 
-    public void delete(String uuid) throws Exception {
+    public boolean delete(String uuid) {
         User u = this.repository.findByUuid(UUID.fromString(uuid));
 
         if (u == null){
-            throw new BadRequestException("Usuário não encontrado!");
+            return false;
         }
 
         u.setStatus(false);
 
         this.repository.save(u);
+        return true;
     }
 
-    public UniqueUserDTO getUnique(String uuid) throws Exception {
+    public UniqueUserDTO getUnique(String uuid) {
         User u = this.repository.findByUuid(UUID.fromString(uuid));
 
         if (u == null){
-            throw new BadRequestException("Usuário não encontrado!");
+            return null;
         }
-        else{
-            return getUniqueUserDTO(u);
-        }
+
+        return getUniqueUserDTO(u);
     }
 
     public List<UserDTO> getAll(){

@@ -15,9 +15,7 @@ import br.com.boss.app.bossapi.model.Truck;
 import br.com.boss.app.bossapi.repository.DeliveryRepository;
 import br.com.boss.app.bossapi.repository.DriverTruckRepository;
 import org.apache.coyote.BadRequestException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -43,11 +41,10 @@ public class DeliveryService {
         Delivery delivery = this.repository.getByUuid(UUID.fromString(deliveryUuid));
 
         if (delivery == null) {
-            throw new BadRequestException("Entrega não encontrada!");
+            return null;
         }
-        else{
-            return persist(delivery, deliveryToUpdate);
-        }
+
+        return persist(delivery, deliveryToUpdate);
     }
 
     private SubmitDeliveryDTO persist(Delivery deliveryToPersist, InputDeliveryDTO deliveryData) throws BadRequestException {
@@ -59,110 +56,114 @@ public class DeliveryService {
         if (currentEntry == null) {
             throw new BadRequestException("A entrada do caminhão e seu motorista não foi encontrada!");
         }
-        else{
-            // Definir dados da entrega
-            // Dados Object
-            deliveryToPersist.setDriver_truck(currentEntry);
-            deliveryToPersist.setDestination(deliveryData.destination());
-            deliveryToPersist.setOrigin(deliveryData.origin());
-            deliveryToPersist.setObservation(deliveryData.observation());
 
-            if (deliveryToPersist.getDeliveryStatus() == null) {
-                deliveryToPersist.setDeliveryStatus(DeliveryStatus.EM_PROGRESSO);
+        // Definir dados da entrega
+        // Dados Object
+        deliveryToPersist.setDriver_truck(currentEntry);
+        deliveryToPersist.setDestination(deliveryData.destination());
+        deliveryToPersist.setOrigin(deliveryData.origin());
+        deliveryToPersist.setObservation(deliveryData.observation());
+
+        if (deliveryToPersist.getDeliveryStatus() == null) {
+            deliveryToPersist.setDeliveryStatus(DeliveryStatus.EM_PROGRESSO);
+        }
+
+        // Dados Double (Arrendondado para 2 casas decimais)
+        deliveryToPersist.setDriverShare(roundUp(deliveryData.driverShare(), 2));
+        deliveryToPersist.setValuePerTon(roundUp(deliveryData.valuePerTon(), 2));
+        deliveryToPersist.setWeight(roundUp(deliveryData.weight(), 2));
+
+        //setar o valor bruto (Arrendondado para 2 casas decimais)
+        deliveryToPersist.setGrossValue(roundUp(deliveryToPersist.getWeight() * deliveryToPersist.getValuePerTon(), 2));
+
+        //setar o valor liquido (Arrendondado para 2 casas decimais)
+        deliveryToPersist.setNetValue(roundUp(deliveryToPersist.getGrossValue() - deliveryToPersist.getDriverShare(), 2));
+
+        // Definir status do dado
+        deliveryToPersist.setStatus(true);
+
+        this.repository.save(deliveryToPersist);
+
+        return new SubmitDeliveryDTO(){
+
+            @Override
+            public String getUuid() {
+                return deliveryToPersist.getUuid().toString();
             }
 
-            // Dados Double (Arrendondado para 2 casas decimais)
-            deliveryToPersist.setDriverShare(roundUp(deliveryData.driverShare(), 2));
-            deliveryToPersist.setValuePerTon(roundUp(deliveryData.valuePerTon(), 2));
-            deliveryToPersist.setWeight(roundUp(deliveryData.weight(), 2));
+            @Override
+            public String getOrigin() {
+                return deliveryToPersist.getOrigin();
+            }
 
-            //setar o valor bruto (Arrendondado para 2 casas decimais)
-            deliveryToPersist.setGrossValue(roundUp(deliveryToPersist.getWeight() * deliveryToPersist.getValuePerTon(), 2));
+            @Override
+            public String getDestination() {
+                return deliveryToPersist.getDestination();
+            }
 
-            //setar o valor liquido (Arrendondado para 2 casas decimais)
-            deliveryToPersist.setNetValue(roundUp(deliveryToPersist.getGrossValue() - deliveryToPersist.getDriverShare(), 2));
+            @Override
+            public Double getValuePerTon() {
+                return deliveryToPersist.getValuePerTon();
+            }
 
-            // Definir status do dado
-            deliveryToPersist.setStatus(true);
+            @Override
+            public Double getGrossValue() {
+                return deliveryToPersist.getGrossValue();
+            }
 
-            this.repository.save(deliveryToPersist);
+            @Override
+            public Double getNetValue() {
+                return deliveryToPersist.getNetValue();
+            }
 
-            return new SubmitDeliveryDTO(){
+            @Override
+            public Double getWeight() {
+                return deliveryToPersist.getWeight();
+            }
 
-                @Override
-                public String getUuid() {
-                    return deliveryToPersist.getUuid().toString();
-                }
+            @Override
+            public EntryDTO getResponsible() {
+                return new EntryDTO(
+                        deliveryToPersist.getDriver_truck().getDriver().getUuid().toString(),
+                        deliveryToPersist.getDriver_truck().getTruck().getUuid().toString()
+                );
+            }
 
-                @Override
-                public String getOrigin() {
-                    return deliveryToPersist.getOrigin();
-                }
+            @Override
+            public String getObservation() {
+                return deliveryToPersist.getObservation();
+            }
 
-                @Override
-                public String getDestination() {
-                    return deliveryToPersist.getDestination();
-                }
-
-                @Override
-                public Double getValuePerTon() {
-                    return deliveryToPersist.getValuePerTon();
-                }
-
-                @Override
-                public Double getGrossValue() {
-                    return deliveryToPersist.getGrossValue();
-                }
-
-                @Override
-                public Double getNetValue() {
-                    return deliveryToPersist.getNetValue();
-                }
-
-                @Override
-                public Double getWeight() {
-                    return deliveryToPersist.getWeight();
-                }
-
-                @Override
-                public EntryDTO getResponsible() {
-                    return new EntryDTO(
-                            deliveryToPersist.getDriver_truck().getDriver().getUuid().toString(),
-                            deliveryToPersist.getDriver_truck().getTruck().getUuid().toString()
-                    );
-                }
-
-                @Override
-                public String getObservation() {
-                    return deliveryToPersist.getObservation();
-                }
-
-                @Override
-                public Double getDriverShare() {
-                    return deliveryToPersist.getDriverShare();
-                }
-            };
-        }
+            @Override
+            public Double getDriverShare() {
+                return deliveryToPersist.getDriverShare();
+            }
+        };
     }
 
     private Double roundUp(Double value, Integer decimalPlaces) {
         return Math.round(value * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
     }
 
-    public void delete(String deliveryrUuid) throws Exception {
+    public boolean delete(String deliveryrUuid) throws Exception {
         Delivery delivery = this.repository.getByUuid(UUID.fromString(deliveryrUuid));
 
         if (delivery == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            return false;
         }
-        else{
-            delivery.setStatus(false);
-            this.repository.save(delivery);
-        }
+
+        delivery.setStatus(false);
+        this.repository.save(delivery);
+        return true;
     }
 
     public UniqueDeliveryDTO getUnique(String deliveryUuid) throws Exception {
         Delivery d = this.repository.getByUuid(UUID.fromString(deliveryUuid));
+
+        if (d == null) {
+            return null;
+        }
+
         Driver driver = d.getDriver_truck().getDriver();
         Truck truck = d.getDriver_truck().getTruck();
 

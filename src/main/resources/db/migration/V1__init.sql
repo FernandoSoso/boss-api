@@ -2,7 +2,7 @@ CREATE TABLE "user" (
                       id SERIAL PRIMARY KEY,
                       uuid UUID DEFAULT gen_random_uuid(),
                       name VARCHAR(255) NOT NULL,
-                      email VARCHAR(50) NOT NULL,
+                      email VARCHAR(50) UNIQUE NOT NULL,
                       password VARCHAR(64) NOT NULL,
                       user_role VARCHAR(255) NOT NULL,
 
@@ -12,7 +12,7 @@ CREATE TABLE "user" (
 CREATE TABLE truck (
                        id SERIAL PRIMARY KEY,
                        uuid UUID DEFAULT gen_random_uuid(),
-                       license_plate VARCHAR(7) NOT NULL,
+                       license_plate VARCHAR(7) UNIQUE NOT NULL,
                        brand VARCHAR(50),
                        model VARCHAR(50),
                        year INT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE driver (
                         primary_phone VARCHAR(15) NOT NULL,
                         secondary_phone VARCHAR(15),
                         email VARCHAR(50),
-                        license_number VARCHAR(11) NOT NULL,
+                        license_number VARCHAR(11) UNIQUE NOT NULL,
                         license_expiration_date DATE NOT NULL,
                         driver_status VARCHAR(255) NOT NULL,
 

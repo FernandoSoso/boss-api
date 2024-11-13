@@ -31,7 +31,7 @@ public class DriverService {
         Driver d = this.repository.findByUuid(UUID.fromString(driverUuid));
 
         if (d == null){
-            throw new BadRequestException("Motorista não encontrado!");
+            return null;
         }
 
         d.setDriverStatus(driverToUpdate.getDriverStatus());
@@ -96,23 +96,23 @@ public class DriverService {
         };
     }
 
-    public void delete(String driverUuid) throws Exception{
+    public boolean delete(String driverUuid) throws Exception{
         Driver driver = this.repository.findByUuid(UUID.fromString(driverUuid));
 
         if (driver == null){
-            throw new BadRequestException("Motorista não encontrado!");
+            return false;
         }
-        else{
-            driver.setStatus(false);
-            this.repository.save(driver);
-        }
+
+        driver.setStatus(false);
+        this.repository.save(driver);
+        return true;
     }
 
     public UniqueDriverDTO getUnique(String driverUuid) throws Exception {
         Driver d = this.repository.findByUuid(UUID.fromString(driverUuid));
 
         if (d == null){
-            throw new BadRequestException("Motorista não encontrado!");
+            return null;
         }
 
         TruckSummaryDTO t = this.repository.getTruck(d.getId());

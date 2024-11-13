@@ -29,7 +29,7 @@ public class TruckService {
         Truck t = this.repository.findByUuid(UUID.fromString(uuid));
 
         if (t == null){
-            throw new BadRequestException("Caminhão não encontrado!");
+            return null;
         }
 
         t.setBrand(updattedTruck.getBrand());
@@ -93,16 +93,17 @@ public class TruckService {
         };
     }
 
-    public void delete(String uuid) throws Exception {
+    public boolean delete(String uuid) {
         Truck t = this.repository.findByUuid(UUID.fromString(uuid));
 
         if (t == null){
-            throw new BadRequestException("Caminhão não encontrado!");
+            return false;
         }
 
         t.setStatus(false);
 
         this.repository.save(t);
+        return true;
     }
 
     public List<TruckDTO> getAll() {
@@ -113,7 +114,7 @@ public class TruckService {
         Truck t = this.repository.findByUuid(UUID.fromString(uuid));
 
         if (t == null){
-            throw new BadRequestException("Caminhão não encontrado!");
+            return null;
         }
 
         DriverSummaryDTO d = this.repository.getDriver(t.getId());
