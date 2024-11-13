@@ -15,7 +15,9 @@ import br.com.boss.app.bossapi.model.Truck;
 import br.com.boss.app.bossapi.repository.DeliveryRepository;
 import br.com.boss.app.bossapi.repository.DriverTruckRepository;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -151,7 +153,7 @@ public class DeliveryService {
         Delivery delivery = this.repository.getByUuid(UUID.fromString(deliveryrUuid));
 
         if (delivery == null) {
-            throw new BadRequestException("Entrega não encontrada!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         else{
             delivery.setStatus(false);

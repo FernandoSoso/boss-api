@@ -25,7 +25,7 @@ public interface TruckRepository extends JpaRepository<Truck, Long> {
             t.status
         FROM truck AS t
         WHERE upper(t.license_plate) = upper(:plate) AND t.status = true
-        \s""", nativeQuery = true)
+        """, nativeQuery = true)
     Truck findByPlate(@Param("plate") String plate);
 
     @Query(value = """

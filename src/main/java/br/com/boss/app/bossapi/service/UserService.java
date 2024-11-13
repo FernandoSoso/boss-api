@@ -22,49 +22,39 @@ public class UserService {
     }
 
     public UniqueUserDTO insert(User submittedUser) throws Exception {
-        User u = this.repository.findByEmail(submittedUser.getEmail());
+        submittedUser.setPassword(HashPassword.getSHA256Hash(submittedUser.getPassword()));
 
-        if (u == null){
-            String encriptedPassword = HashPassword.getSHA256Hash(submittedUser.getPassword());
-
-            System.out.println(submittedUser.getUserRole());
-            submittedUser.setPassword(encriptedPassword);
-
-            return persist(submittedUser);
-        }
-        else{
-            throw new BadRequestException("Email já cadastrado!");
-        }
+        return persist(submittedUser);
     }
 
-    public UniqueUserDTO update (User toUpdateUser, String userId) throws Exception {
-        toUpdateUser.setUuid(UUID.fromString(userId));
+    public UniqueUserDTO update (User userData, String userId) throws Exception {
         User u = this.repository.findByUuid(UUID.fromString(userId));
 
         if (u == null){
             throw new BadRequestException("Usuário não encontrado!");
         }
-        else{
-            u = this.repository.findByEmail(toUpdateUser.getEmail());
 
-            if (!Objects.equals(u.getUuid().toString(), userId)){
+        u.setName(userData.getName());
+        u.setEmail(userData.getEmail());
+        u.setUserRole(userData.getUserRole());
+        u.setPassword(HashPassword.getSHA256Hash(userData.getPassword()));
+
+        return persist(u);
+    }
+
+    private UniqueUserDTO persist(User userToPersist) throws Exception {
+        User u = this.repository.findByEmail(userToPersist.getEmail());
+
+        if (u != null){
+            if (!u.getUuid().equals(userToPersist.getUuid())){
                 throw new BadRequestException("Email já cadastrado!");
             }
         }
 
-        // Se a senha não for a mesma, é criptografada a nova senha
-        if (!u.getPassword().equals(toUpdateUser.getPassword())){
-            toUpdateUser.setPassword(HashPassword.getSHA256Hash(toUpdateUser.getPassword()));
-        }
+        userToPersist.setStatus(true);
+        this.repository.save(userToPersist);
 
-        return persist(toUpdateUser);
-    }
-
-    private UniqueUserDTO persist(User u){
-        u.setStatus(true);
-        this.repository.save(u);
-
-        return getUniqueUserDTO(u);
+        return getUniqueUserDTO(userToPersist);
     }
 
 

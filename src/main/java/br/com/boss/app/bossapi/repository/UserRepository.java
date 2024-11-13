@@ -11,41 +11,41 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = """
-        SELECT\s
-        u.id,\s
-        u.uuid,\s
-        u.email,\s
-        u.password,\s
-        u.name,\s
-        u.user_role,\s
-        u.status\s
+        SELECT
+        u.id,
+        u.uuid,
+        u.email,
+        u.password,
+        u.name,
+        u.user_role,
+        u.status
         FROM "user" AS u
         WHERE u.email = :email AND u.status = true
-        \s""", nativeQuery = true)
+    """, nativeQuery = true)
     User findByEmail(@Param("email") String email);
 
     @Query(value = """
-        SELECT\s
-        u.id,\s
-        u.uuid,\s
-        u.email,\s
-        u.password,\s
-        u.name,\s
-        u.user_role,\s
-        u.status\s
+        SELECT
+        u.id,
+        u.uuid,
+        u.email,
+        u.password,
+        u.name,
+        u.user_role,
+        u.status
         FROM "user" AS u
         WHERE u.uuid = :uuid AND u.status = true
-        \s""", nativeQuery = true)
+    """, nativeQuery = true)
     User findByUuid(@Param("uuid") UUID uuid);
 
     @Query(value = """
-        SELECT\s
-        u.uuid,\s
-        u.email,\s
-        u.name,\s
-        u.user_role\s
+        SELECT
+        u.uuid,
+        u.email,
+        u.name,
+        u.user_role
         FROM "user" AS u
         WHERE u.status = true
-   \s""", nativeQuery = true)
+   """, nativeQuery = true)
     List<UserDTO> getAllUsers();
 }

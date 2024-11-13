@@ -24,73 +24,74 @@ public class DriverService {
     }
 
     public SubmitDriverDTO insert(Driver newDriver) throws Exception {
-        Driver t = this.repository.findByLicenseNumber(newDriver.getLicenseNumber());
-
-        if (t == null){
-            return persist(newDriver);
-        }
-        else{
-            throw new BadRequestException("CNH já cadastrada!");
-        }
+        return persist(newDriver);
     }
 
     public SubmitDriverDTO update(Driver driverToUpdate, String driverUuid) throws Exception {
-        Driver driver = this.repository.findByUuid(UUID.fromString(driverUuid));
+        Driver d = this.repository.findByUuid(UUID.fromString(driverUuid));
 
-        if (driver == null){
+        if (d == null){
             throw new BadRequestException("Motorista não encontrado!");
         }
-        else {
-            driver = this.repository.findByLicenseNumber(driverToUpdate.getLicenseNumber());
 
-            if (driver == null){
-                return persist(driverToUpdate);
-            }
-            else{
+        d.setDriverStatus(driverToUpdate.getDriverStatus());
+        d.setEmail(driverToUpdate.getEmail());
+        d.setLicenseExpirationDate(driverToUpdate.getLicenseExpirationDate());
+        d.setLicenseNumber(driverToUpdate.getLicenseNumber());
+        d.setName(driverToUpdate.getName());
+        d.setPrimaryPhone(driverToUpdate.getPrimaryPhone());
+        d.setSecondaryPhone(driverToUpdate.getSecondaryPhone());
+
+        return persist(d);
+    }
+
+    private SubmitDriverDTO persist(Driver driverToPersist) throws Exception {
+        Driver d = this.repository.findByLicenseNumber(driverToPersist.getLicenseNumber());
+
+        if (d != null){
+            if (!d.getUuid().equals(driverToPersist.getUuid())) {
                 throw new BadRequestException("CNH já cadastrada!");
             }
         }
-    }
 
-    private SubmitDriverDTO persist(Driver d) {
-        d.setStatus(true);
-        this.repository.save(d);
+        driverToPersist.setStatus(true);
+        this.repository.save(driverToPersist);
 
         return new SubmitDriverDTO() {
 
             @Override
             public String getUuid() {
-                return d.getUuid().toString();
+                return driverToPersist.getUuid().toString();
             }
 
             @Override
             public String getName() {
-                return d.getName();
+                return driverToPersist.getName();
             }
 
             @Override
             public String getLicenseNumber() {
-                return d.getLicenseNumber();
+                return driverToPersist.getLicenseNumber();
             }
 
             @Override
             public Date getLicenseExpirationDate() {
-                return d.getLicenseExpirationDate();
+                return driverToPersist.getLicenseExpirationDate();
             }
 
             @Override
             public String getPrimaryPhone() {
-                return d.getPrimaryPhone();
+                return driverToPersist.getPrimaryPhone();
             }
 
             @Override
             public String getSecondaryPhone() {
-                return d.getSecondaryPhone();
+                return driverToPersist.getSecondaryPhone();
             }
 
             @Override
             public String getEmail() {
-                return d.getEmail();
+                return driverToPersist.getEmail();
             }
         };
     }

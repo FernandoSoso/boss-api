@@ -22,74 +22,73 @@ public class TruckService {
     }
 
     public SubmitTruckDTO insert(Truck newTruck) throws Exception {
-        Truck t = this.repository.findByPlate(newTruck.getLicensePlate());
-
-        if (t == null){
-            return persist(newTruck);
-        }
-        else{
-            throw new BadRequestException("Placa já cadastrada!");
-        }
+        return persist(newTruck);
     }
 
     public SubmitTruckDTO update(Truck updattedTruck, String uuid) throws Exception {
-        updattedTruck.setUuid(UUID.fromString(uuid));
         Truck t = this.repository.findByUuid(UUID.fromString(uuid));
 
         if (t == null){
             throw new BadRequestException("Caminhão não encontrado!");
         }
-        else{
-            t = this.repository.findByPlate(updattedTruck.getLicensePlate());
 
-            if (t != null){
-                if (!t.getUuid().toString().equals(uuid)) {
-                    throw new BadRequestException("Placa já cadastrada!");
-                }
+        t.setBrand(updattedTruck.getBrand());
+        t.setModel(updattedTruck.getModel());
+        t.setYear(updattedTruck.getYear());
+        t.setCapacity(updattedTruck.getCapacity());
+        t.setDriverPercentage(updattedTruck.getDriverPercentage());
+        t.setLicensePlate(updattedTruck.getLicensePlate());
+        t.setTruckStatus(updattedTruck.getTruckStatus());
+
+        return persist(t);
+    }
+
+    private SubmitTruckDTO persist(Truck truckToPersist) throws Exception {
+        Truck t = this.repository.findByPlate(truckToPersist.getLicensePlate());
+
+        if (t != null){
+            if (!t.getUuid().equals(truckToPersist.getUuid())) {
+                throw new BadRequestException("Placa já cadastrada!");
             }
         }
 
-        return persist(updattedTruck);
-    }
-
-    private SubmitTruckDTO persist(Truck t){
-        t.setStatus(true);
-        this.repository.save(t);
+        truckToPersist.setStatus(true);
+        this.repository.save(truckToPersist);
 
         return new SubmitTruckDTO() {
             @Override
             public String getUuid() {
-                return t.getUuid().toString();
+                return truckToPersist.getUuid().toString();
             }
 
             @Override
             public String getLicensePlate() {
-                return t.getLicensePlate();
+                return truckToPersist.getLicensePlate();
             }
 
             @Override
             public String getBrand() {
-                return t.getBrand();
+                return truckToPersist.getBrand();
             }
 
             @Override
             public String getModel() {
-                return t.getModel();
+                return truckToPersist.getModel();
             }
 
             @Override
             public Integer getYear() {
-                return t.getYear();
+                return truckToPersist.getYear();
             }
 
             @Override
             public Double getCapacity() {
-                return t.getCapacity();
+                return truckToPersist.getCapacity();
             }
 
             @Override
             public Double getDriverPercentage() {
-                return t.getDriverPercentage();
+                return truckToPersist.getDriverPercentage();
             }
         };
     }
