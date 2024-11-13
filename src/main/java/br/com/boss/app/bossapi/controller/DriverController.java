@@ -1,56 +1,99 @@
 package br.com.boss.app.bossapi.controller;
 
-import br.com.boss.app.bossapi.dto.driver.response.DriverDTO;
-import br.com.boss.app.bossapi.dto.driver.request.SubmitDriverDTO;
-import br.com.boss.app.bossapi.dto.driver.response.UniqueDriverDTO;
+import br.com.boss.app.bossapi.dto.driver.DriverDTO;
+import br.com.boss.app.bossapi.dto.driver.SubmitDriverDTO;
+import br.com.boss.app.bossapi.dto.driver.UniqueDriverDTO;
+import br.com.boss.app.bossapi.model.Driver;
+import br.com.boss.app.bossapi.service.DriverService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.annotation.WebServlet;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
 
-@WebServlet("/driver")
+@RestController
+@RequestMapping("/driver")
+@Tag(name = "Drivers", description = "Path relacionado a operações de motoristas")
 public class DriverController {
 
-    //        String async = req.getParameter("async");
-//        String cod = req.getParameter("cod");
-//        String operacao = req.getParameter("operacao");
-//        String offset = req.getParameter("offset");
-//        String limit = req.getParameter("limit");
+    private final DriverService service;
 
-    @GetMapping("/")
-    public DriverDTO getDrivers() {
-        //TODO: Implementar
-
-        return null;
+    DriverController(DriverService service){
+        this.service = service;
     }
 
-    @GetMapping("/unique/{id}")
-    public UniqueDriverDTO uniqueDriver(@PathVariable Long id) {
-        //TODO: Implementar
-        return null;
+    @GetMapping("/")
+    @Operation(summary = "Listar motoristas", description = "Retorna uma lista com todos os motoristas cadastrados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Motoristas encontrados"),
+            @ApiResponse(responseCode = "404", description = "Nenhum motorista encontrado")
+    })
+    public ResponseEntity<List<DriverDTO>> getDrivers() {
+        List<DriverDTO> drivers = this.service.getAll();
+
+        return ResponseEntity.ok(drivers);
+    }
+
+    @GetMapping("/unique/{uuid}")
+    @Operation(summary = "Buscar motorista por UUID", description = "Retorna um motorista correspondente ao UUID fornecido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Motorista encontrado"),
+            @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
+    })
+    public ResponseEntity<UniqueDriverDTO> uniqueDriver(@PathVariable String uuid) throws Exception {
+        UniqueDriverDTO driver = this.service.getUnique(uuid);
+        return ResponseEntity.ok(driver);
     }
 
     @PostMapping("/submit")
-    public void submitDriver(@RequestBody SubmitDriverDTO newDriverData) {
-        //TODO: Implementar e ver necessidade das props antigas
+    @Transactional
+    @Operation(summary = "Cadastrar motorista", description = "Cadastra um motorista no sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Motorista cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro ao cadastrar motorista")
+    })
+    public ResponseEntity<SubmitDriverDTO> submitDriver(@RequestBody @Valid Driver newDriverData, UriComponentsBuilder uriBuilder) throws Exception {
+        SubmitDriverDTO driver = this.service.insert(newDriverData);
 
-//        String operacao = req.getParameter("operacao");
-//        String codMotorista = req.getParameter("cod");
-//        String nome = req.getParameter("nome");
-//        String endereco = req.getParameter("endereco");
-//        String telefonePrincipal = req.getParameter("telefonePrincipal");
-//        String telefoneAlternativo = req.getParameter("telefoneAlternativo");
-//        String telefoneAlternativo2 = req.getParameter("telefoneAlternativo2");
-//        String codCaminhao = req.getParameter("caminhao");
+        URI uri = uriBuilder.path("/driver/unique/{uuid}").buildAndExpand(driver.getUuid()).toUri();
+
+        return ResponseEntity.created(uri).body(driver);
     }
 
-    @PutMapping("/alter/{id}")
-    public void alterDriver(@PathVariable String id, @RequestBody SubmitDriverDTO driverData) {
-        //TODO: Implementar
+    @PutMapping("/alter/{uuid}")
+    @Transactional
+    @Operation(summary = "Alterar motorista", description = "Altera um motorista do sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Motorista alterado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
+    })
+    public ResponseEntity<SubmitDriverDTO> alterDriver(@PathVariable String uuid, @RequestBody @Valid Driver driverData) throws Exception {
+        SubmitDriverDTO driver = this.service.update(driverData, uuid);
+
+        return ResponseEntity.ok(driver);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteDriver(@PathVariable String id) {
-        //TODO: Implementar
+    @DeleteMapping("/{uuid}")
+    @Transactional
+    @Operation(summary = "Deletar motorista", description = "Deleta um motorista do sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Motorista deletado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
+    })
+    public ResponseEntity<Void> deleteDriver(@PathVariable String uuid) throws Exception {
+        this.service.delete(uuid);
+
+        return ResponseEntity.noContent().build();
     }
 }
