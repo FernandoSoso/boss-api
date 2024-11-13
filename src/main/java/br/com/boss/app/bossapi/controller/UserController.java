@@ -1,13 +1,16 @@
 package br.com.boss.app.bossapi.controller;
 
-import br.com.boss.app.bossapi.dto.user.request.SubmitUserDTO;
-import br.com.boss.app.bossapi.dto.user.response.UniqueUserDTO;
-import br.com.boss.app.bossapi.dto.user.response.UserDTO;
+import br.com.boss.app.bossapi.dto.user.UniqueUserDTO;
+import br.com.boss.app.bossapi.dto.user.UserDTO;
 import br.com.boss.app.bossapi.model.User;
-import br.com.boss.app.bossapi.repository.UserRepository;
 import br.com.boss.app.bossapi.service.UserService;
-import jakarta.servlet.annotation.WebServlet;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +19,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-@WebServlet("/user")
+@RestController
+@RequestMapping("/user")
+@Tag(name = "Users", description = "Path para manipulação de usuários")
 public class UserController {
-    //        String async = req.getParameter("async");
-//        String cod = req.getParameter("cod");
-//        String operacao = req.getParameter("operacao");
-//        String offset = req.getParameter("offset");
-//        String limit = req.getParameter("limit");
+
     private final UserService service;
 
     UserController(UserService service){
@@ -30,39 +31,78 @@ public class UserController {
     }
 
     @GetMapping("/")
+    @Operation(summary = "Listar usuários", description = "Retorna uma lista com todos os usuários cadastrados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuários encontrados",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado", content = @Content)
+    })
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> userList = service.getAll();
 
-        return ResponseEntity.ok(userList);
+        if (userList.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        else{
+            return ResponseEntity.ok(userList);
+        }
     }
 
-    @GetMapping("/unique/{id}")
-    public ResponseEntity<UniqueUserDTO> uniqueUser(@PathVariable String id) {
-        UniqueUserDTO u = this.service.getUnique(id);
+    @GetMapping("/unique/{uuid}")
+    @Operation(summary = "Buscar usuário por UUID", description = "Retorna um usuário correspondente ao UUID fornecido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UniqueUserDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content)
+    })
+    public ResponseEntity<UniqueUserDTO> uniqueUser(@PathVariable String uuid) throws Exception {
+        UniqueUserDTO u = this.service.getUnique(uuid);
 
         return ResponseEntity.ok(u);
     }
 
+    @Transactional
     @PostMapping("/submit")
-    public ResponseEntity<SubmitUserDTO> submitUser(@RequestBody @Valid SubmitUserDTO newUserData, UriComponentsBuilder uriBuilder) throws Exception {
-        this.service.insert(newUserData);
+    @Operation(summary = "Cadastrar um novo usuário", description = "Cria um novo usuário e o adiciona à lista")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UniqueUserDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
+    })
+    public ResponseEntity<UniqueUserDTO> submitUser(@RequestBody @Valid User newUserData, UriComponentsBuilder uriBuilder) throws Exception {
+        UniqueUserDTO returnedUser = this.service.insert(newUserData);
 
-        URI uri = uriBuilder.path("/user/unique/{id}").buildAndExpand(newUserData.getUuid()).toUri();
+        URI uri = uriBuilder.path("/user/{uuid}").buildAndExpand(newUserData.getUuid()).toUri();
 
-        return ResponseEntity.created(uri).body(newUserData);
+        return ResponseEntity.created(uri).body(returnedUser);
     }
 
-    @PutMapping("/alter/{id}")
-    public ResponseEntity<SubmitUserDTO> alterUser(@PathVariable String id, @RequestBody SubmitUserDTO userData) throws Exception {
-        this.service.update(userData, id);
-
-        return ResponseEntity.ok(userData);
+    @Transactional
+    @PutMapping("/alter/{uuid}")
+    @Operation(summary = "Alterar um usuário", description = "Altera um usuário existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário alterado com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UniqueUserDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Usuário não encontrado ou dados inválidos fornecidos")
+    })
+    public ResponseEntity<UniqueUserDTO> alterUser(@PathVariable String uuid, @RequestBody User userData) throws Exception {
+        UniqueUserDTO returnedUser = this.service.update(userData, uuid);
+        return ResponseEntity.ok(returnedUser);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deleteUser(@PathVariable String id) {
-        this.service.delete(id);
-
+    @Transactional
+    @DeleteMapping("/{uuid}")
+    @Operation(summary = "Deletar um usuário", description = "Deleta um usuário existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Usuário não encontrado")
+    })
+    public ResponseEntity<Void> deleteUser(@PathVariable String uuid) throws Exception {
+        this.service.delete(uuid);
         return ResponseEntity.noContent().build();
     }
 }

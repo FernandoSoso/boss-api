@@ -1,17 +1,19 @@
 package br.com.boss.app.bossapi.service;
 
-import br.com.boss.app.bossapi.dto.user.request.SubmitUserDTO;
-import br.com.boss.app.bossapi.dto.user.response.UniqueUserDTO;
-import br.com.boss.app.bossapi.dto.user.response.UserDTO;
-import br.com.boss.app.bossapi.enums.Role;
+import br.com.boss.app.bossapi.dto.user.UniqueUserDTO;
+import br.com.boss.app.bossapi.dto.user.UserDTO;
+import br.com.boss.app.bossapi.enums.UserRole;
 import br.com.boss.app.bossapi.model.User;
 import br.com.boss.app.bossapi.repository.UserRepository;
-import br.com.boss.app.bossapi.util.SenhaHash;
+import br.com.boss.app.bossapi.util.HashPassword;
+import org.apache.coyote.BadRequestException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Service
 public class UserService {
     private final UserRepository repository;
 
@@ -19,72 +21,90 @@ public class UserService {
         this.repository = repository;
     }
 
-    public void insert(SubmitUserDTO user) throws Exception {
-        User u = this.repository.findByEmail(user.getEmail());
+    public UniqueUserDTO insert(User submittedUser) throws Exception {
+        User u = this.repository.findByEmail(submittedUser.getEmail());
 
         if (u == null){
-            String encriptedPassword = SenhaHash.getSHA256Hash(user.getPassword());
+            String encriptedPassword = HashPassword.getSHA256Hash(submittedUser.getPassword());
 
-            u = new User(
-                user.getEmail(),
-                encriptedPassword,
-                user.getName(),
-                user.getRole()
-            );
+            System.out.println(submittedUser.getUserRole());
+            submittedUser.setPassword(encriptedPassword);
 
-            this.repository.save(u);
+            return persist(submittedUser);
         }
         else{
-            throw new Exception("Email já cadastrado!");
+            throw new BadRequestException("Email já cadastrado!");
         }
     }
 
-    public void update (SubmitUserDTO user, String userId) throws Exception {
-        User u = this.repository.findByEmail(user.getEmail());
+    public UniqueUserDTO update (User toUpdateUser, String userId) throws Exception {
+        toUpdateUser.setUuid(UUID.fromString(userId));
+        User u = this.repository.findByUuid(UUID.fromString(userId));
 
-        if (u != null){
-            if (!Objects.equals(u.getUuid(), userId)){
-                throw new Exception("Email já cadastrado!");
-            }
+        if (u == null){
+            throw new BadRequestException("Usuário não encontrado!");
         }
         else{
-            u = this.repository.findByUuid(userId);
+            u = this.repository.findByEmail(toUpdateUser.getEmail());
+
+            if (!Objects.equals(u.getUuid().toString(), userId)){
+                throw new BadRequestException("Email já cadastrado!");
+            }
         }
 
         // Se a senha não for a mesma, é criptografada a nova senha
-        if (!u.getPassword().equals(user.getPassword())){
-            u.setPassword(SenhaHash.getSHA256Hash(user.getPassword()));
+        if (!u.getPassword().equals(toUpdateUser.getPassword())){
+            toUpdateUser.setPassword(HashPassword.getSHA256Hash(toUpdateUser.getPassword()));
         }
 
-        // Atualização de propriedades
-        u.setPassword(user.getPassword());
-        u.setRole(user.getRole());
-        u.setName(user.getName());
-        u.setEmail(user.getEmail());
+        return persist(toUpdateUser);
+    }
+
+    private UniqueUserDTO persist(User u){
+        u.setStatus(true);
+        this.repository.save(u);
+
+        return getUniqueUserDTO(u);
+    }
+
+
+    public void delete(String uuid) throws Exception {
+        User u = this.repository.findByUuid(UUID.fromString(uuid));
+
+        if (u == null){
+            throw new BadRequestException("Usuário não encontrado!");
+        }
+
+        u.setStatus(false);
 
         this.repository.save(u);
     }
 
-    public void delete(String uuid){
-        this.repository.deleteByUuid(uuid);
+    public UniqueUserDTO getUnique(String uuid) throws Exception {
+        User u = this.repository.findByUuid(UUID.fromString(uuid));
+
+        if (u == null){
+            throw new BadRequestException("Usuário não encontrado!");
+        }
+        else{
+            return getUniqueUserDTO(u);
+        }
     }
 
-    public UniqueUserDTO getUnique(String uuid){
-        User u = this.repository.findByUuid(uuid);
+    public List<UserDTO> getAll(){
+       return repository.getAllUsers();
+    }
 
+    private UniqueUserDTO getUniqueUserDTO(User u) {
         return new UniqueUserDTO() {
             @Override
             public String getName() {return u.getName();}
             @Override
             public String getEmail() {return u.getEmail();}
             @Override
-            public Role getRole() {return u.getRole();}
+            public UserRole getUserRole() {return u.getUserRole();}
             @Override
-            public String getUuid() {return u.getUuid();}
+            public String getUuid() {return u.getUuid().toString();}
         };
-    }
-
-    public List<UserDTO> getAll(){
-       return repository.findAllUsers();
     }
 }
