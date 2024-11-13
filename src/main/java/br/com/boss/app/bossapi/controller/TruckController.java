@@ -7,6 +7,7 @@ import br.com.boss.app.bossapi.dto.truck.SubmitTruckDTO;
 import br.com.boss.app.bossapi.model.Truck;
 import br.com.boss.app.bossapi.service.TruckService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,7 +53,9 @@ public class TruckController {
             )),
             @ApiResponse(responseCode = "404", description = "Caminhão não encontrado")
     })
-    public ResponseEntity<UniqueTruckDTO> uniqueTruck(@PathVariable String uuid) throws Exception {
+    public ResponseEntity<UniqueTruckDTO> uniqueTruck(
+            @Parameter(description = "Uuid do caminhão a ser retornado") @PathVariable String uuid
+    ) throws Exception {
         UniqueTruckDTO u = this.service.getUnique(uuid);
 
         if (u == null) {
@@ -72,7 +75,10 @@ public class TruckController {
             )),
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
     })
-    public ResponseEntity<SubmitTruckDTO> submitTruck(@RequestBody @Valid Truck newTruckData, UriComponentsBuilder uriBuilder) throws Exception {
+    public ResponseEntity<SubmitTruckDTO> submitTruck(
+            @Parameter(description = "Dados do caminhão a ser cadastrado") @RequestBody @Valid Truck newTruckData,
+            UriComponentsBuilder uriBuilder
+    ) throws Exception {
         SubmitTruckDTO newTruck = this.service.insert(newTruckData);
 
         URI uri = uriBuilder.path("/user/unique/{uuid}").buildAndExpand(newTruckData.getUuid()).toUri();
@@ -90,7 +96,10 @@ public class TruckController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos"),
             @ApiResponse(responseCode = "404", description = "Caminhão não encontrado")
     })
-    public ResponseEntity<SubmitTruckDTO> alterTruck(@PathVariable String uuid, @RequestBody @Valid Truck truckData) throws Exception {
+    public ResponseEntity<SubmitTruckDTO> alterTruck(
+            @Parameter(description = "Uuid do caminhão a ser editado") @PathVariable String uuid,
+            @Parameter(description = "Dados do caminhão a serem alterados") @RequestBody @Valid Truck truckData
+    ) throws Exception {
         SubmitTruckDTO newTruck = this.service.update(truckData, uuid);
 
         if (newTruck == null) {
@@ -108,7 +117,9 @@ public class TruckController {
             @ApiResponse(responseCode = "204", description = "Caminhão deletado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Caminhão não encontrado")
     })
-    public ResponseEntity<Void> deleteTruck(@PathVariable String uuid) {
+    public ResponseEntity<Void> deleteTruck(
+            @Parameter(description = "Uuid do caminhão a ser excluído") @PathVariable String uuid
+    ) {
 
         if (this.service.delete(uuid)) {
             return ResponseEntity.noContent().build();

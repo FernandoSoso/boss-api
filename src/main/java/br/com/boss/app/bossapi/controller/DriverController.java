@@ -6,6 +6,7 @@ import br.com.boss.app.bossapi.dto.driver.UniqueDriverDTO;
 import br.com.boss.app.bossapi.model.Driver;
 import br.com.boss.app.bossapi.service.DriverService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,7 +48,9 @@ public class DriverController {
             @ApiResponse(responseCode = "200", description = "Motorista encontrado"),
             @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
     })
-    public ResponseEntity<UniqueDriverDTO> uniqueDriver(@PathVariable String uuid) throws Exception {
+    public ResponseEntity<UniqueDriverDTO> uniqueDriver(
+            @Parameter(description = "Uuid do motorista a ser retornado") @PathVariable String uuid
+    ) throws Exception {
         UniqueDriverDTO driver = this.service.getUnique(uuid);
 
         if (driver == null) {
@@ -65,7 +68,10 @@ public class DriverController {
             @ApiResponse(responseCode = "201", description = "Motorista cadastrado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados fornecidos são inválidos")
     })
-    public ResponseEntity<SubmitDriverDTO> submitDriver(@RequestBody @Valid Driver newDriverData, UriComponentsBuilder uriBuilder) throws Exception {
+    public ResponseEntity<SubmitDriverDTO> submitDriver(
+            @Parameter(description = "Dados do motorista a ser cadastrado") @RequestBody @Valid Driver newDriverData,
+            UriComponentsBuilder uriBuilder
+    ) throws Exception {
         SubmitDriverDTO driver = this.service.insert(newDriverData);
 
         URI uri = uriBuilder.path("/driver/unique/{uuid}").buildAndExpand(driver.getUuid()).toUri();
@@ -81,7 +87,10 @@ public class DriverController {
             @ApiResponse(responseCode = "400", description = "Dados fornecidos são inválidos"),
             @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
     })
-    public ResponseEntity<SubmitDriverDTO> alterDriver(@PathVariable String uuid, @RequestBody @Valid Driver driverData) throws Exception {
+    public ResponseEntity<SubmitDriverDTO> alterDriver(
+            @Parameter(description = "Uuid do motorista a ser alterado") @PathVariable String uuid,
+            @Parameter(description = "Dados a serem alterados do motorista") @RequestBody @Valid Driver driverData
+    ) throws Exception {
         SubmitDriverDTO driver = this.service.update(driverData, uuid);
 
         if (driver == null) {
@@ -99,7 +108,9 @@ public class DriverController {
             @ApiResponse(responseCode = "204", description = "Motorista deletado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
     })
-    public ResponseEntity<Void> deleteDriver(@PathVariable String uuid) throws Exception {
+    public ResponseEntity<Void> deleteDriver(
+            @Parameter(description = "Uuid do motorista a ser deletado") @PathVariable String uuid
+    ) throws Exception {
         if (this.service.delete(uuid)) {
             return ResponseEntity.noContent().build();
         }

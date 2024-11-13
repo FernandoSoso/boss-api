@@ -4,6 +4,7 @@ import br.com.boss.app.bossapi.dto.driver_truck.EntryDTO;
 import br.com.boss.app.bossapi.dto.driver_truck.Driver_TruckDTO;
 import br.com.boss.app.bossapi.service.DriverTruckService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +33,9 @@ public class DriverTruckController {
             @ApiResponse(responseCode = "200", description = "Histórico encontrado"),
             @ApiResponse(responseCode = "404", description = "Caminhão não encontrado")
     })
-    public ResponseEntity<List<Driver_TruckDTO>> getTruckHistory(@PathVariable String uuid){
+    public ResponseEntity<List<Driver_TruckDTO>> getTruckHistory(
+            @Parameter(description = "Uuid do caminhão a ter seu histórico retornado") @PathVariable String uuid
+    ){
         if (service.getTruckHistory(uuid) == null) {
             return ResponseEntity.notFound().build();
         }
@@ -47,7 +50,9 @@ public class DriverTruckController {
             @ApiResponse(responseCode = "200", description = "Histórico encontrado"),
             @ApiResponse(responseCode = "404", description = "Motorista não encontrado")
     })
-    public ResponseEntity<List<Driver_TruckDTO>> getDriverHistory(@PathVariable String uuid){
+    public ResponseEntity<List<Driver_TruckDTO>> getDriverHistory(
+            @Parameter(description = "Uuid do motorista a ter seu histórico retornado") @PathVariable String uuid
+    ){
         List<Driver_TruckDTO> driverHistory = service.getDriverHistory(uuid);
 
         if (driverHistory == null) {
@@ -66,7 +71,9 @@ public class DriverTruckController {
             @ApiResponse(responseCode = "204", description = "Entrada não alterada"),
             @ApiResponse(responseCode = "400", description = "Dados forncecidos são inválidos")
     })
-    public ResponseEntity<Void> changeEntry(@RequestBody @Valid EntryDTO newEntryDTO) throws Exception {
+    public ResponseEntity<Void> changeEntry(
+            @Parameter(description = "Uuids do caminhão e motorista a ser adicionado na entrada atual") @RequestBody @Valid EntryDTO newEntryDTO
+    ) throws Exception {
         boolean isCreated = this.service.changeHistory(newEntryDTO);
 
         if (isCreated) {
@@ -83,7 +90,9 @@ public class DriverTruckController {
             @ApiResponse(responseCode = "204", description = "Entrada finalizada com sucesso"),
             @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
     })
-    public ResponseEntity<Void> endHistory(@PathVariable String uuid) throws Exception {
+    public ResponseEntity<Void> endHistory(
+            @Parameter(description = "Uuid da entrada a ser terminada") @PathVariable String uuid
+    ) throws Exception {
 
         if(this.service.endHistory(uuid)){
             return ResponseEntity.noContent().build();

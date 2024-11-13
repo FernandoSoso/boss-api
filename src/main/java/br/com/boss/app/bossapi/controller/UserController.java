@@ -5,6 +5,7 @@ import br.com.boss.app.bossapi.dto.user.UserDTO;
 import br.com.boss.app.bossapi.model.User;
 import br.com.boss.app.bossapi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,7 +52,9 @@ public class UserController {
                             schema = @Schema(implementation = UniqueUserDTO.class))),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content)
     })
-    public ResponseEntity<UniqueUserDTO> uniqueUser(@PathVariable String uuid) {
+    public ResponseEntity<UniqueUserDTO> uniqueUser(
+            @Parameter(description = "Uuid do usuário a ser retornado") @PathVariable String uuid
+    ) {
         UniqueUserDTO u = this.service.getUnique(uuid);
 
         if (u == null) {
@@ -71,7 +74,10 @@ public class UserController {
                             schema = @Schema(implementation = UniqueUserDTO.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos", content = @Content)
     })
-    public ResponseEntity<UniqueUserDTO> submitUser(@RequestBody @Valid User newUserData, UriComponentsBuilder uriBuilder) throws Exception {
+    public ResponseEntity<UniqueUserDTO> submitUser(
+            @Parameter(description = "Dados do usuário a ser cadastrado") @RequestBody @Valid User newUserData,
+            UriComponentsBuilder uriBuilder
+    ) throws Exception {
         UniqueUserDTO returnedUser = this.service.insert(newUserData);
 
         URI uri = uriBuilder.path("/user/{uuid}").buildAndExpand(newUserData.getUuid()).toUri();
@@ -89,7 +95,10 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos", content = @Content),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content)
     })
-    public ResponseEntity<UniqueUserDTO> alterUser(@PathVariable String uuid, @RequestBody User userData) throws Exception {
+    public ResponseEntity<UniqueUserDTO> alterUser(
+            @Parameter(description = "Uuid do usuário a ser alterado") @PathVariable String uuid,
+            @Parameter(description = "Dados a serem alterados do usuário") @RequestBody User userData
+    ) throws Exception {
         UniqueUserDTO returnedUser = this.service.update(userData, uuid);
 
         if (returnedUser == null) {
@@ -107,7 +116,9 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "Usuário deletado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    public ResponseEntity<Void> deleteUser(@PathVariable String uuid) {
+    public ResponseEntity<Void> deleteUser(
+            @Parameter(description = "Uuid do usuário a ser deletado") @PathVariable String uuid
+    ) {
         if (this.service.delete(uuid)) {
             return ResponseEntity.noContent().build();
         }
