@@ -1,6 +1,6 @@
-package br.com.boss.app.bossapi.dto.truck.response;
+package br.com.boss.app.bossapi.dto.truck;
 
-import br.com.boss.app.bossapi.dto.driver.response.DriverSummaryDTO;
+import br.com.boss.app.bossapi.dto.driver.DriverSummaryDTO;
 import br.com.boss.app.bossapi.enums.SituationStatus;
 
 public interface UniqueTruckDTO {

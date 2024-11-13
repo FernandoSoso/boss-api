@@ -1,4 +1,4 @@
-package br.com.boss.app.bossapi.dto.driver.response;
+package br.com.boss.app.bossapi.dto.driver;
 
 import java.util.Date;
 

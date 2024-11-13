@@ -1,10 +1,10 @@
-package br.com.boss.app.bossapi.dto.driver.response;
+package br.com.boss.app.bossapi.dto.driver;
 
-import br.com.boss.app.bossapi.dto.truck.response.TruckSummaryDTO;
+import br.com.boss.app.bossapi.dto.truck.TruckSummaryDTO;
 import br.com.boss.app.bossapi.enums.SituationStatus;
 
 public interface UniqueDriverDTO {
-    public Long getUuid();
+    public String getUuid();
     public String getName();
     public String getLicenseNumber();
     public String getLicenseExpirationDate();
