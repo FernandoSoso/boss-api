@@ -14,6 +14,7 @@ import br.com.boss.app.bossapi.model.Driver_Truck;
 import br.com.boss.app.bossapi.model.Truck;
 import br.com.boss.app.bossapi.repository.DeliveryRepository;
 import br.com.boss.app.bossapi.repository.DriverTruckRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Tag(name = "Serviço de entregas", description = "Serviço de entregas")
 public class DeliveryService {
     private final DeliveryRepository repository;
     private final DriverTruckRepository driverTruckRepository;

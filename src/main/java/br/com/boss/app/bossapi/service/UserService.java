@@ -5,14 +5,16 @@ import br.com.boss.app.bossapi.dto.user.UserDTO;
 import br.com.boss.app.bossapi.enums.UserRole;
 import br.com.boss.app.bossapi.model.User;
 import br.com.boss.app.bossapi.repository.UserRepository;
-import br.com.boss.app.bossapi.util.HashPassword;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Tag(name = "Serviço de usuários", description = "Serviço de usuários")
 public class UserService {
     private final UserRepository repository;
 
@@ -21,7 +23,7 @@ public class UserService {
     }
 
     public UniqueUserDTO insert(User submittedUser) throws Exception {
-        submittedUser.setPassword(HashPassword.getSHA256Hash(submittedUser.getPassword()));
+        submittedUser.setPassword(new BCryptPasswordEncoder().encode(submittedUser.getPassword()));
 
         return persist(submittedUser);
     }
@@ -36,7 +38,7 @@ public class UserService {
         u.setName(userData.getName());
         u.setEmail(userData.getEmail());
         u.setUserRole(userData.getUserRole());
-        u.setPassword(HashPassword.getSHA256Hash(userData.getPassword()));
+        u.setPassword(new BCryptPasswordEncoder().encode(userData.getPassword()));
 
         return persist(u);
     }

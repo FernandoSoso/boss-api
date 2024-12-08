@@ -1,4 +1,4 @@
-package br.com.boss.app.bossapi.infra;
+package br.com.boss.app.bossapi.infra.exceptions;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

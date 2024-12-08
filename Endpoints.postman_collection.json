@@ -371,7 +371,37 @@
 			"name": "User",
 			"item": [
 				{
-					"name": "cadastrar",
+					"name": "cadastrar - USER",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Fernando Soso\",\r\n    \"password\": \"senhA123\",\r\n    \"email\": \"fernandososo@mail.com\",\r\n    \"userRole\": \"USer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/user/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"user",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cadastrar - ADMIN",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -380,7 +410,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Fernando Soso\",\r\n    \"password\": \"senhA123\",\r\n    \"email\": \"fernandososo@mail.com\",\r\n    \"userRole\": \"USer\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Fernando Soso\",\r\n    \"password\": \"senhA123\",\r\n    \"email\": \"fernandososo@mail.com\",\r\n    \"userRole\": \"admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -461,7 +491,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/boss-api/user/unique/2c3418a3-6154-429f-97c3-427446fcaa3b",
+							"raw": "http://localhost:8080/boss-api/user/unique/91130628-5b10-4442-8074-b1c6fd445324",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -471,7 +501,7 @@
 								"boss-api",
 								"user",
 								"unique",
-								"2c3418a3-6154-429f-97c3-427446fcaa3b"
+								"91130628-5b10-4442-8074-b1c6fd445324"
 							]
 						}
 					},
@@ -629,6 +659,154 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "login - USER",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"token\", pm.response.json().token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"fernandouser@mail.com\",\r\n    \"password\": \"senhA123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login - ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"token\", pm.response.json().token);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"fernandoadmin@mail.com\",\r\n    \"password\": \"senhA123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/boss-api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"boss-api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
